@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Http\Requests;
 
 use App\User;
+use App\Photo;
 use App\Role;
 use App\Http\Requests\UsersRequest;
 
@@ -46,9 +47,33 @@ class AdminUsersController extends Controller
     {
         //
 		//return view('admin.users.store');
-		User::create($request->all());
+		//User::create($request->all());
+		
+		
+		$input = $request->all();
+		
+		//jika user mengupload file, maka ini akan dijalankan
+		if($file = $request->file('photo_id')){
+			//set nama file --> waktu + nama original file
+			$name = time() .$file->getClientOriginalName();
+			
+			//move file to image folder
+			$file->move('images', $name);
+			
+			//buat object photo dari file yang diupload
+			$photo = Photo::create(['file'=>$name]);
+			
+			//set photo_id
+			$input['photo_id'] = $photo->id;	
+		}
+		
+		//enkrip password sebelum di simpan ke database
+		$input['password'] = bcrypt($request->password);
+		//simpan ke database
+		User::create($input);
+		
 		return redirect('/admin/users');
-    }
+	}
 
     /**
      * Display the specified resource.
