@@ -9,7 +9,9 @@ use App\Http\Requests;
 use App\User;
 use App\Photo;
 use App\Role;
+use App\Http\Requests\UsersEditRequest;
 use App\Http\Requests\UsersRequest;
+use Illuminate\Support\Facades\Session;
 
 class AdminUsersController extends Controller
 {
@@ -49,11 +51,20 @@ class AdminUsersController extends Controller
 		//return view('admin.users.store');
 		//User::create($request->all());
 		
+		if(trim($request->password) == '')
+		{
+			$input = $request->except('password');
+		}
+		else{
+			$input = $request->all();
+			$input['password'] = bcrypt($request->password);
+		}
 		
-		$input = $request->all();
+		//$input = $request->all();
 		
 		//jika user mengupload file, maka ini akan dijalankan
-		if($file = $request->file('photo_id')){
+		if($file = $request->file('photo_id'))
+		{
 			//set nama file --> waktu + nama original file
 			$name = time() .$file->getClientOriginalName();
 			
@@ -68,7 +79,7 @@ class AdminUsersController extends Controller
 		}
 		
 		//enkrip password sebelum di simpan ke database
-		$input['password'] = bcrypt($request->password);
+		//$input['password'] = bcrypt($request->password);
 		//simpan ke database
 		User::create($input);
 		
@@ -108,9 +119,35 @@ class AdminUsersController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(UsersEditRequest $request, $id)
     {
         //
+		
+		$user = User::findOrFail($id);
+		
+		if(trim($request->password) == ''){
+			$input = $request->except('password');
+		}
+		else{
+			$input = $request->all();
+			$input['password'] = bcrypt($request->password);
+		}
+
+		//$input = $request->all();
+		
+		if($file = $request->file('photo_id')){
+			$name = time() . $file->getClientOriginalName();
+			$file->move('images', $name);
+			$photo = Photo::create(['file'=>$name]);
+			$input['photo_id'] = $photo->id;
+		}
+		
+		$user->update($input);
+		
+		return redirect('/admin/users');
+		
+		
+		//return $request->all();
     }
 
     /**
@@ -122,5 +159,11 @@ class AdminUsersController extends Controller
     public function destroy($id)
     {
         //
+		$user=User::findOrFail($id)->delete();
+		unlink(public_path() . $user->photo->file);
+		$user->delete();
+		
+		Session::flash('deleted_user', 'The user has been deleted.');
+		return redirect('/admin/users');
     }
 }
