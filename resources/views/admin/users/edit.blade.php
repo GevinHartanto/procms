@@ -3,6 +3,7 @@
 
 @section('content')
 
+
 	<h1>Edit User</h1>
 	<div class="col-sm-3">
 		<img src="{{$user->photo ? $user->photo->file : ''}}" class="img-responsive img-rounded" />
