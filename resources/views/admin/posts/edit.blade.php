@@ -2,10 +2,9 @@
 
 @section('content')
 
-<h1>Edit Post Post</h1>
+<h1>Edit Post</h1>
 
-
-{!! Form::model(['method'=>'PATCH', 'action'=>['AdminPostsController@update', $post->id], 'files'=>true]) !!}
+{!! Form::model($post, ['method'=>'PATCH', 'action'=>['AdminPostsController@update', $post->id], 'files'=>true]) !!}
 
 <div class="form-group">
 	{!! Form::label('title', 'Title:') !!}
@@ -28,13 +27,22 @@
 </div>
 
 <div class="form-group">
-	{!! Form::submit('Create Post', ['class'=>'btn btn-primary']) !!}
+	{!! Form::submit('Update Post', ['class'=>'btn btn-primary']) !!}
 </div>
 
 {!! Form::close() !!}
 
+
+{!! Form::open(['method'=>'DELETE', 'action'=>['AdminPostsController@destroy', $post->id]]) !!}
+	
+<div class="form-group">
+	{!! Form::submit('Delete Post', ['class'=>'btn btn-danger']) !!}
+</div>
+	
+{!! Form::close() !!}
+
 	@include('includes.form_error')
 
-@stop
 
 @stop
+
