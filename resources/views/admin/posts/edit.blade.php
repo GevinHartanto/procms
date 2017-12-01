@@ -4,6 +4,12 @@
 
 <h1>Edit Post Post</h1>
 
+<div class="col-sm-3">
+	<img src="{{$post->photo->file}}" class="img-responsive" />
+</div>
+
+<div class="col-sm-9">
+
 
 {!! Form::model(['method'=>'PATCH', 'action'=>['AdminPostsController@update', $post->id], 'files'=>true]) !!}
 
@@ -32,9 +38,9 @@
 </div>
 
 {!! Form::close() !!}
+</div>	
 
 	@include('includes.form_error')
 
 @stop
 
-@stop
